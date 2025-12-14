@@ -3,14 +3,6 @@ using Zin.Editor;
 using Zin.Editor.Input;
 using Zin.Platform.Base;
 
-#if WINDOWS_X64
-using Zin.Platform.Windows.Managed;
-#elif LINUX_X64
-using Zin.Platform.Linux.Managed;
-#else
-#error Unknown target platform
-#endif
-
 namespace Zin;
 
 public static class Program
@@ -18,9 +10,9 @@ public static class Program
     public static void Main(string[] args)
     {
 #if WINDOWS_X64
-        using ITerminal terminal = new WindowsTerminal();
+        using ITerminal terminal = new Platform.Windows.Managed.WindowsTerminal();
 #elif LINUX_X64
-        using ITerminal terminal = new LinuxTerminal();
+        using ITerminal terminal = new Platform.Linux.Managed.LinuxTerminal();
 #else
 #error Unknown target platform
 #endif
