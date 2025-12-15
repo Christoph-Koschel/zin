@@ -8,7 +8,9 @@ public sealed class RenderChain
     private const string ESC_CLEAR_LINE = "\x1b[K";
 
     private const string ESC_CURS_MV_TOP = "\x1b[H";
-    private const string ESC_CURS_MV_TO = "\x1b[{0};{1}H";
+    private const string ESC_CURS_MV_TO_0 = "\x1b[";
+    private const string ESC_CURS_MV_TO_1 = ";";
+    private const string ESC_CURS_MV_TO_2 = "H";
     private const string ESC_CURS_HIDDE = "\x1b[?25l";
     private const string ESC_CURS_SHOW = "\x1b[?25h";
 
@@ -37,7 +39,11 @@ public sealed class RenderChain
      */
     public void MoveCursor(Cursor cursor)
     {
-        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, cursor.Y + 1, cursor.X + 1));
+        _renderBuffer.Append(ESC_CURS_MV_TO_0);
+        _renderBuffer.Append(cursor.Y + 1);
+        _renderBuffer.Append(ESC_CURS_MV_TO_1);
+        _renderBuffer.Append(cursor.X + 1);
+        _renderBuffer.Append(ESC_CURS_MV_TO_2);
     }
 
     /**
@@ -45,7 +51,11 @@ public sealed class RenderChain
      */
     public void MoveCursor(int x, int y)
     {
-        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, y + 1, x + 1));
+        _renderBuffer.Append(ESC_CURS_MV_TO_0);
+        _renderBuffer.Append(y + 1);
+        _renderBuffer.Append(ESC_CURS_MV_TO_1);
+        _renderBuffer.Append(x + 1);
+        _renderBuffer.Append(ESC_CURS_MV_TO_2);
     }
 
     /**
