@@ -16,7 +16,7 @@ public static class Program
 #else
 #error Unknown target platform
 #endif
-        KeyMap keyMap = new KeyMap();
+        KeyMap keyMap = KeyMap.Default();
 
         terminal.EnableRawMode();
 

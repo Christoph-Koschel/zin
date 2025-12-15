@@ -41,7 +41,7 @@ public sealed class ZinEditor
             }
 
 
-            _keyMap.RunKeyShortcut(this, c);
+            _keyMap.ExecuteShortcut(this, c);
             
 			if (_stopped)
             {

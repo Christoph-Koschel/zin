@@ -1,62 +1,44 @@
-﻿using Zin.Platform.Base;
+﻿using System;
+using System.Collections.Generic;
+
+using Zin.Platform.Base;
 
 namespace Zin.Editor.Input;
 
 public sealed class KeyMap
 {
-    public InputChar ExitShortCut = new InputChar('q', true);
-	public InputChar MoveCursorUp = new InputChar(InputChar.EscapeCode.ArrowUp, true);
-	public InputChar MoveCursorLeft = new InputChar(InputChar.EscapeCode.ArrowLeft, true);
-	public InputChar MoveCursorDown = new InputChar(InputChar.EscapeCode.ArrowDown, true);
-	public InputChar MoveCursorRight = new InputChar(InputChar.EscapeCode.ArrowRight, true);
+	private readonly Dictionary<InputChar, Action<ZinEditor>> _actions;
 
     public KeyMap()
     {
-
+		_actions = new Dictionary<InputChar, Action<ZinEditor>>();
     }
 
-    public void RunKeyShortcut(ZinEditor editor, InputChar input)
-    {
-        if (input == ExitShortCut)
-        {
-            editor.Stop();
-            return;
-        }
-		
-		if (input == MoveCursorUp)
+	public void RegisterAction(InputChar shortcut, Action<ZinEditor> action)
+	{
+		_actions[shortcut] = action;
+	}
+
+	public void ExecuteShortcut(ZinEditor editor, InputChar input) {
+		if (_actions.TryGetValue(input, out Action<ZinEditor> action))
 		{
-			if (editor.Cursor.Y >= 0)
-			{			
-				editor.Cursor.Y--;
-			}
-			return;
+			action.Invoke(editor);
 		}
+	}
+
+	public static KeyMap Default()
+	{
+		KeyMap map = new KeyMap();
+		map.RegisterAction(new InputChar('q', true), EditorActions.Exit);
 		
-		if (input == MoveCursorLeft)
-		{
-			if (editor.Cursor.X >= 0)
-			{
-				editor.Cursor.X--;
-			}
-			return;
-		}
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.ArrowUp, true), EditorActions.MoveCursorUp);
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.ArrowDown, true), EditorActions.MoveCursorDown);
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.ArrowLeft, true), EditorActions.MoveCursorLeft);
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.ArrowRight, true), EditorActions.MoveCursorRight);
 		
-		if (input == MoveCursorDown)
-		{
-			if (editor.Cursor.Y < editor.Height)
-			{
-				editor.Cursor.Y++;
-			}
-			return;
-		}
-		
-		if (input == MoveCursorRight)
-		{
-			if (editor.Cursor.X < editor.Width)
-			{
-				editor.Cursor.X++;
-			}
-			return;
-		}
-    }
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.PageUp, true), EditorActions.MoveCursorUp);
+		map.RegisterAction(new InputChar(InputChar.EscapeCode.PageDown, true), EditorActions.MoveCursorDown);
+	
+		return map;
+	}
 }
