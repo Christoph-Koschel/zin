@@ -37,7 +37,7 @@ public sealed class RenderChain
      */
     public void MoveCursor(Cursor cursor)
     {
-        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, cursor.Y, cursor.X));
+        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, cursor.Y + 1, cursor.X + 1));
     }
 
     /**
@@ -45,7 +45,7 @@ public sealed class RenderChain
      */
     public void MoveCursor(int x, int y)
     {
-        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, y, x));
+        _renderBuffer.Append(string.Format(ESC_CURS_MV_TO, y + 1, x + 1));
     }
 
     /**
