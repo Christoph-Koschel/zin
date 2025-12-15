@@ -1,32 +1,22 @@
+using Zin.Platform.Linux.Managed;
+
 namespace Zin.Platform.Base;
 
 public static class VT100Parser
 {
-    public static InputChar Parse(ITerminal terminal)
+    public static InputChar Parse()
     {
         InputChar input;
 
-        if (!terminal.Read(out byte seq0))
+        if (!TermShim.Read(out byte seq0) ||
+            seq0 != '[' ||
+            !TermShim.Read(out byte seq1))
         {
             return new InputChar(InputChar.EscapeCode.Escape, true);
         }
 
-        if (seq0 != '[')
-        {
-            return new InputChar(InputChar.EscapeCode.Escape, true);
-        }
-
-        if (!terminal.Read(out byte seq1))
-        {
-            return new InputChar(InputChar.EscapeCode.Escape, true);
-        }
-
-        if (TryParseNumberCommand(terminal, seq1, out input))
-        {
-            return input;
-        }
-
-        if (TryParseLetterCommands(seq1, out input))
+        if (TryParseNumberCommand(seq1, out input) ||
+            TryParseLetterCommands(seq1, out input))
         {
             return input;
         }
@@ -34,21 +24,11 @@ public static class VT100Parser
         return new InputChar(InputChar.EscapeCode.Escape, true);
     }
 
-    private static bool TryParseNumbeCommand(ITerminal terminal, byte seq1, out InputChar input)
+    private static bool TryParseNumberCommand(byte seq1, out InputChar input)
     {
-        if (seq1 < '0' && seq1 > '9')
-        {
-            input = null;
-            return false;
-        }
-
-        if (!terminal.Read(out byte seq2))
-        {
-            input = null;
-            return false;
-        }
-
-        if (seq2 != '~')
+        if (seq1 < '0' || seq1 > '9' ||
+            !TermShim.Read(out byte seq2) ||
+            seq2 != '~')
         {
             input = null;
             return false;
@@ -56,11 +36,11 @@ public static class VT100Parser
 
         switch (seq1)
         {
-            case '5':
-                input = new InputChar(InputChar.EscapeCode.PageUp);
+            case (byte)'5':
+                input = new InputChar(InputChar.EscapeCode.PageUp, true);
                 return true;
-            case '6':
-                input = new InputChar(InputChar.EscapeCode.PageDown);
+            case (byte)'6':
+                input = new InputChar(InputChar.EscapeCode.PageDown, true);
                 return true;
         }
 

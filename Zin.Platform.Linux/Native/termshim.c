@@ -43,5 +43,5 @@ int term_read(char* c_out)
 
 void term_write(char* str, int count)
 {
-    write(STDIN_FILENO, str, count);
+    write(STDOUT_FILENO, str, count);
 }
