@@ -1,6 +1,6 @@
-using Zin.Platform.Linux.Managed;
+using Zin.Platform.Base;
 
-namespace Zin.Platform.Base;
+namespace Zin.Platform.Linux.Managed;
 
 public static class VT100Parser
 {
