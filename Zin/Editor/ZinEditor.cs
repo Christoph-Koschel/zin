@@ -31,7 +31,6 @@ public sealed class ZinEditor
         _renderChain = new RenderChain(terminal.Width, terminal.Height);
         Content = new EditorContent(terminal.Height);
         Cursor = new Cursor();
-        Cursor.Y = 10;
     }
 
     public void Run()
@@ -80,9 +79,9 @@ public sealed class ZinEditor
             
             if (Content.TryGetLine(y + Content.ScrollOffset.Y, out string line))
             {
-                _renderChain.Write(line, _terminal.Width);
-            } 
-            else
+                _renderChain.Write(line, Content.ScrollOffset.X, _terminal.Width);
+            }
+            else if (Content.ScrollOffset.X == 0)
             {
                 _renderChain.Write('~');
             }

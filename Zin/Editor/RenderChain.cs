@@ -29,9 +29,16 @@ public sealed class RenderChain
     public void Write(string str) => _renderBuffer.Append(str);
     public void Write(string str, int length)
     {
-        int computedLength = Math.Min(str.Length, length); 
+        int computedLength = Math.Min(str.Length, length);
         Span<char> buff = stackalloc char[computedLength];
         str.AsSpan(0, computedLength).CopyTo(buff);
+        _renderBuffer.Append(buff);
+    }
+    public void Write(string str, int offset, int length)
+    {
+        int computedLength = Math.Min(Math.Max(str.Length - offset, 0), length);
+        Span<char> buff = stackalloc char[computedLength];
+        str.AsSpan(offset, computedLength).CopyTo(buff);
         _renderBuffer.Append(buff);
     }
     public void Write(char c) => _renderBuffer.Append(c);
