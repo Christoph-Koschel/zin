@@ -13,10 +13,15 @@ public sealed class ZinEditor
     private readonly KeyMap _keyMap;
     private bool _stopped;
     private RenderChain _renderChain;
-
+    
     public Cursor Cursor;
+    public EditorContent Content;
+    
     public int Width => _terminal.Width;
     public int Height => _terminal.Height;
+
+    public int ScrollPanelWidth => Width;
+    public int ScrollPanelHeight => Height - 1;
 
     public ZinEditor(ITerminal terminal, KeyMap keyMap)
     {
@@ -24,6 +29,7 @@ public sealed class ZinEditor
         _keyMap = keyMap;
         _stopped = false;
         _renderChain = new RenderChain(terminal.Width, terminal.Height);
+        Content = new EditorContent(terminal.Height);
         Cursor = new Cursor();
         Cursor.Y = 10;
     }
@@ -40,15 +46,10 @@ public sealed class ZinEditor
                 continue;
             }
 
-
             _keyMap.ExecuteShortcut(this, c);
 
             if (_stopped)
             {
-                _renderChain.PrepareRender();
-                _renderChain.ClearScreen();
-                _renderChain.MoveCursor();
-                _terminal.Write(_renderChain.Render());
                 break;
             }
 
@@ -66,16 +67,6 @@ public sealed class ZinEditor
 
         RenderRows();
 
-        string title = $"{Title} v{Version}";
-        _renderChain.MoveCursor(Cursor);
-        _renderChain.Write(title);
-
-        if (c is not null)
-        {
-            _renderChain.MoveCursor(0, 0);
-            _renderChain.Write($"Input Char: {c.Char}, Ctrl: {c.Ctrl}, Escape: {c.Escape}");
-        }
-
         _renderChain.MoveCursor(Cursor);
         _renderChain.ShowCursor();
         _terminal.Write(_renderChain.Render());
@@ -85,12 +76,20 @@ public sealed class ZinEditor
     {
         for (int y = 0; y < _terminal.Height - 1; y++)
         {
-            _renderChain.Write('~');
             _renderChain.ClearLine();
+            
+            if (Content.TryGetLine(y + Content.ScrollOffset.Y, out string line))
+            {
+                _renderChain.Write(line, _terminal.Width);
+            } 
+            else
+            {
+                _renderChain.Write('~');
+            }
             _renderChain.LineBreak();
         }
 
-        _renderChain.Write("~");
+        _renderChain.Write("VISUELL");
         _renderChain.MoveCursor();
     }
 }

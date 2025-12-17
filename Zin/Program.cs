@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Zin.Editor;
 using Zin.Editor.Input;
 using Zin.Platform.Base;
@@ -17,13 +18,20 @@ public static class Program
 #error Unknown target platform
 #endif
         KeyMap keyMap = KeyMap.Default();
-
         terminal.EnableRawMode();
 
         ZinEditor editor = new ZinEditor(terminal, keyMap);
-        editor.Run();
 
-        // Clean up terminal
-        Console.Write("\n\rExiting...\n\r");
+        editor.Content.OpenContent(GenerateLines());
+
+        editor.Run();
+    }
+
+    private static IEnumerable<string> GenerateLines()
+    {
+        for (int i = 0; i < 200; i++)
+        {
+            yield return  i + "] Hello this is some line";
+        }
     }
 }

@@ -37,7 +37,7 @@ public sealed class LinuxTerminal : ITerminal
 
         if (c == '\x1b')
         {
-            return VT100Parser.Parse();
+            return new InputChar(ParseVT100(), true);
         }
 
         return new InputChar(c);
@@ -48,5 +48,74 @@ public sealed class LinuxTerminal : ITerminal
     public void Dispose()
     {
         DisableRawMode();
+    }
+
+    private InputChar.EscapeCode ParseVT100()
+    {
+        if (!TermShim.Read(out byte seq0))
+        {
+            return InputChar.EscapeCode.Escape;
+        }
+
+        if (!TermShim.Read(out byte seq1))
+        {
+            return InputChar.EscapeCode.Escape;
+        }
+
+        if (seq0 == '[')
+        {
+            if (seq1 >= '0' && seq1 <= '9')
+            {
+
+                if (!TermShim.Read(out byte seq2))
+                {
+                    return InputChar.EscapeCode.Escape;
+                }
+
+                if (seq2 == '~')
+                {
+                    return seq1 switch
+                    {
+                        (byte)'1' => InputChar.EscapeCode.Home,
+                        (byte)'3' => InputChar.EscapeCode.Delete,
+                        (byte)'4' => InputChar.EscapeCode.End,
+                        (byte)'5' => InputChar.EscapeCode.PageUp,
+                        (byte)'6' => InputChar.EscapeCode.PageDown,
+                        (byte)'7' => InputChar.EscapeCode.Home,
+                        (byte)'8' => InputChar.EscapeCode.End,
+                        _ => InputChar.EscapeCode.Escape
+                    };
+                }
+
+                return seq1 switch
+                {
+                    (byte)'A' => InputChar.EscapeCode.ArrowUp,
+                    (byte)'B' => InputChar.EscapeCode.ArrowDown,
+                    (byte)'C' => InputChar.EscapeCode.ArrowRight,
+                    (byte)'D' => InputChar.EscapeCode.ArrowLeft,
+                    (byte)'H' => InputChar.EscapeCode.Home,
+                    (byte)'F' => InputChar.EscapeCode.End,
+                    _ => InputChar.EscapeCode.Escape
+                };
+            }
+            
+            return InputChar.EscapeCode.Escape;
+        }
+
+        if (seq0 == 'O')
+        {
+            return seq1 switch
+            {
+                (byte)'A' => InputChar.EscapeCode.ArrowUp,
+                (byte)'B' => InputChar.EscapeCode.ArrowDown,
+                (byte)'C' => InputChar.EscapeCode.ArrowRight,
+                (byte)'D' => InputChar.EscapeCode.ArrowLeft,
+                (byte)'H' => InputChar.EscapeCode.Home,
+                (byte)'F' => InputChar.EscapeCode.End,
+                _ => InputChar.EscapeCode.Escape
+            };
+        }
+
+        return InputChar.EscapeCode.Escape;
     }
 }

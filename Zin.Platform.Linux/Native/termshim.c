@@ -5,6 +5,8 @@ struct termios orig_termios;
 
 int term_exit_raw_mode(void)
 {
+    write(STDOUT_FILENO, "\x1b[?1l\x1b[?1049l", 13);
+ 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     {
         return 0;
@@ -32,6 +34,8 @@ int term_enter_raw_mode(void)
     {
         return 0;
     }
+
+    write(STDOUT_FILENO, "\x1b[?1049h\x1b[?1h", 13);
 
     return 1;
 }

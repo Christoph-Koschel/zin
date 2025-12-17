@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Zin.Editor;
 
@@ -26,6 +27,13 @@ public sealed class RenderChain
     public void PrepareRender() => _renderBuffer.Clear();
 
     public void Write(string str) => _renderBuffer.Append(str);
+    public void Write(string str, int length)
+    {
+        int computedLength = Math.Min(str.Length, length); 
+        Span<char> buff = stackalloc char[computedLength];
+        str.AsSpan(0, computedLength).CopyTo(buff);
+        _renderBuffer.Append(buff);
+    }
     public void Write(char c) => _renderBuffer.Append(c);
 
     public void LineBreak() => _renderBuffer.Append(EOL);
