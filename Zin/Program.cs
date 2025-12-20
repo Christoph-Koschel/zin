@@ -30,7 +30,7 @@ public static class Program
     {
         for (int i = 0; i < 200; i++)
         {
-            yield return  i + "] Hello this is some line";
+            yield return  i + "] Hello this is a very long line that must exceeds the windows width. So just in case here are some extra characters that help to achieve this goal 12345";
         }
     }
 }

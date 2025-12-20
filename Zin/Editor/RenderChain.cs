@@ -6,7 +6,9 @@ namespace Zin.Editor;
 public sealed class RenderChain
 {
     private const string ESC_CLEAR_SCREEN = "\x1b[2J";
-    private const string ESC_CLEAR_LINE = "\x1b[K";
+    private const string ESC_CLEAR_LINE_RIGHT = "\x1b[K";
+    private const string ESC_CLEAR_LINE_LEFT = "\x1b[1K";
+    private const string ESC_CLEAR_LINE = "\x1b[2K";
 
     private const string ESC_CURS_MV_TOP = "\x1b[H";
     private const string ESC_CURS_MV_TO_0 = "\x1b[";
@@ -42,9 +44,12 @@ public sealed class RenderChain
         _renderBuffer.Append(buff);
     }
     public void Write(char c) => _renderBuffer.Append(c);
+    public void Write(int i) => _renderBuffer.Append(i);
 
     public void LineBreak() => _renderBuffer.Append(EOL);
 
+    public void ClearLineRight() => _renderBuffer.Append(ESC_CLEAR_LINE_RIGHT);
+    public void ClearLineLeft() => _renderBuffer.Append(ESC_CLEAR_LINE_LEFT);
     public void ClearLine() => _renderBuffer.Append(ESC_CLEAR_LINE);
 
     public void ClearScreen() => _renderBuffer.Append(ESC_CLEAR_SCREEN);

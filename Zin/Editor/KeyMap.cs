@@ -44,6 +44,9 @@ public sealed class KeyMap
         map.RegisterAction(new InputChar(InputChar.EscapeCode.PageUp, true), EditorActions.MovePageUp);
         map.RegisterAction(new InputChar(InputChar.EscapeCode.PageDown, true), EditorActions.MovePageDown);
 
+        map.RegisterAction(new InputChar(InputChar.EscapeCode.Home, true), EditorActions.MoveToStartOfLine);
+        map.RegisterAction(new InputChar(InputChar.EscapeCode.End, true), EditorActions.MoveToEndOfLine);
+
         return map;
     }
 }

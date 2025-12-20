@@ -24,14 +24,14 @@ public class EditorContent
     {
         _rows.Clear();
         _rows.AddRange(content.Split(Environment.NewLine));
-        _rows.Select(row => row.Length).Max();
+        MaxWidth = _rows.Select(row => row.Length).Max();
     }
 
     public void OpenContent(IEnumerable<string> lines)
     {
         _rows.Clear();
         _rows.AddRange(lines);
-        _rows.Select(row => row.Length).Max();
+        MaxWidth = _rows.Select(row => row.Length).Max();
     }
 
     public bool TryGetLine(int i, out string line)

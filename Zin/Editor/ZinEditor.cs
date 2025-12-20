@@ -1,13 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
 using Zin.Platform.Base;
 
 namespace Zin.Editor;
 
 public sealed class ZinEditor
 {
-    private static string Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-    private static string Title => "Zin Editor";
-
     private readonly ITerminal _terminal;
     private readonly KeyMap _keyMap;
     private bool _stopped;
@@ -15,6 +12,7 @@ public sealed class ZinEditor
     
     public Vector2 Cursor;
     public EditorContent Content;
+    public EditorMode Mode;
     
     public int Width => _terminal.Width;
     public int Height => _terminal.Height;
@@ -28,8 +26,10 @@ public sealed class ZinEditor
         _keyMap = keyMap;
         _stopped = false;
         _renderChain = new RenderChain(terminal.Width, terminal.Height);
-        Content = new EditorContent(terminal.Height);
+
         Cursor = new Vector2();
+        Content = new EditorContent(terminal.Height);
+        Mode = EditorMode.Visuell;
     }
 
     public void Run()
@@ -64,6 +64,7 @@ public sealed class ZinEditor
         _renderChain.MoveCursor();
 
         RenderRows();
+        RenderBottomLine();
 
         _renderChain.MoveCursor(Cursor);
         _renderChain.ShowCursor();
@@ -74,7 +75,7 @@ public sealed class ZinEditor
     {
         for (int y = 0; y < _terminal.Height - 1; y++)
         {
-            _renderChain.ClearLine();
+            _renderChain.ClearLineRight();
             
             if (Content.TryGetLine(y + Content.ScrollOffset.Y, out string line))
             {
@@ -86,8 +87,19 @@ public sealed class ZinEditor
             }
             _renderChain.LineBreak();
         }
+    }
 
-        _renderChain.Write("VISUELL");
-        _renderChain.MoveCursor();
+    private void RenderBottomLine()
+    {
+        string modeText = Mode.GetModeText();
+        string xText = Convert.ToString(Cursor.X);
+        string yText = Convert.ToString(Cursor.Y + Content.ScrollOffset.Y + 1);
+        _renderChain.MoveCursor(Width - xText.Length - yText.Length - modeText.Length - 2, Height - 1);
+        _renderChain.ClearLine();
+        _renderChain.Write(modeText);
+        _renderChain.Write(' ');
+        _renderChain.Write(xText);
+        _renderChain.Write(':');
+        _renderChain.Write(yText);
     }
 }
