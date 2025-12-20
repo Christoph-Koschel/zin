@@ -2,17 +2,17 @@
 
 namespace Zin.Platform.Linux.Managed;
 
-internal static class TermShim
+internal static partial class TermShim
 {
-    [DllImport("termshim", EntryPoint = "term_enter_raw_mode")]
-    public static extern bool EnterRawMode();
+    [LibraryImport("termshim", EntryPoint = "term_enter_raw_mode")]
+    public static partial int EnterRawMode();
 
-    [DllImport("termshim", EntryPoint = "term_exit_raw_mode")]
-    public static extern bool ExitRawMode();
+    [LibraryImport("termshim", EntryPoint = "term_exit_raw_mode")]
+    public static partial int ExitRawMode();
 
-    [DllImport("termshim", EntryPoint = "term_read")]
-    public static extern bool Read(out byte c);
+    [LibraryImport("termshim", EntryPoint = "term_read")]
+    public static partial int Read(out byte c);
 
-    [DllImport("termshim", EntryPoint = "term_write", CharSet = CharSet.Ansi)]
-    public static extern bool Write([MarshalAs(UnmanagedType.LPStr)] string buf, int count);
+    [LibraryImport("termshim", EntryPoint = "term_write", StringMarshalling = StringMarshalling.Utf8)]
+    public static partial int Write(string buf, int count);
 }

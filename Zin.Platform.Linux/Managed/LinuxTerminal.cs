@@ -14,7 +14,7 @@ public sealed class LinuxTerminal : ITerminal
 
     public void EnableRawMode()
     {
-        if (!TermShim.EnterRawMode())
+        if (TermShim.EnterRawMode() != 1)
         {
             throw new Exception("Fail to enable raw mode");
         }
@@ -22,7 +22,7 @@ public sealed class LinuxTerminal : ITerminal
 
     public void DisableRawMode()
     {
-        if (!TermShim.ExitRawMode())
+        if (TermShim.ExitRawMode() != 1)
         {
             throw new Exception("Fail to disable raw mode");
         }
@@ -30,7 +30,7 @@ public sealed class LinuxTerminal : ITerminal
 
     public InputChar Read()
     {
-        if (!TermShim.Read(out byte c))
+        if (TermShim.Read(out byte c) != 1)
         {
             return new InputChar(0);
         }
@@ -52,12 +52,12 @@ public sealed class LinuxTerminal : ITerminal
 
     private InputChar.EscapeCode ParseVT100()
     {
-        if (!TermShim.Read(out byte seq0))
+        if (TermShim.Read(out byte seq0) != 1)
         {
             return InputChar.EscapeCode.Escape;
         }
 
-        if (!TermShim.Read(out byte seq1))
+        if (TermShim.Read(out byte seq1) != 1)
         {
             return InputChar.EscapeCode.Escape;
         }
@@ -67,7 +67,7 @@ public sealed class LinuxTerminal : ITerminal
             if (seq1 >= '0' && seq1 <= '9')
             {
 
-                if (!TermShim.Read(out byte seq2))
+                if (TermShim.Read(out byte seq2) != 1)
                 {
                     return InputChar.EscapeCode.Escape;
                 }

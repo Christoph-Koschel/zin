@@ -10,7 +10,7 @@ public sealed class WindowsTerminal : ITerminal
 
     public void EnableRawMode()
     {
-        if (!TermShim.EnterRawMode())
+        if (TermShim.EnterRawMode() != 1)
         {
             throw new Exception("Fail to enable raw mode");
         }
@@ -18,7 +18,7 @@ public sealed class WindowsTerminal : ITerminal
 
     public void DisableRawMode()
     {
-        if (!TermShim.ExitRawMode())
+        if (TermShim.ExitRawMode() != 1)
         {
             throw new Exception("Fail to disable raw mode");
         }
@@ -26,7 +26,7 @@ public sealed class WindowsTerminal : ITerminal
 
     public InputChar Read()
     {
-        if (!TermShim.Read(out byte c))
+        if (TermShim.Read(out byte c) != 1)
         {
             return new InputChar(0);
         }
