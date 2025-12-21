@@ -9,11 +9,14 @@ public sealed class ZinEditor
     private readonly KeyMap _keyMap;
     private bool _stopped;
     private RenderChain _renderChain;
-    
-    public Vector2 Cursor;
+    private bool _ignoreDirty;
+    private Vector2 _cursor;
+    private Vector2 _offset;
+
     public EditorContent Content;
     public EditorMode Mode;
-    
+
+    public ImmutableVector2 AbsoluteCursor => new ImmutableVector2(_cursor.X + _offset.X, _cursor.Y + _offset.Y);
     public int Width => _terminal.Width;
     public int Height => _terminal.Height;
 
@@ -26,10 +29,12 @@ public sealed class ZinEditor
         _keyMap = keyMap;
         _stopped = false;
         _renderChain = new RenderChain(terminal.Width, terminal.Height);
+        _ignoreDirty = true;
+        _cursor = new Vector2();
+        _offset = new Vector2();
 
-        Cursor = new Vector2();
         Content = new EditorContent(terminal.Height);
-        Mode = EditorMode.Visuell;
+        Mode = EditorMode.Command;
     }
 
     public void Run()
@@ -41,6 +46,7 @@ public sealed class ZinEditor
             InputChar c = _terminal.Read();
             if (c.Invalid)
             {
+                Render();
                 continue;
             }
 
@@ -57,6 +63,44 @@ public sealed class ZinEditor
 
     public void Stop() => _stopped = true;
 
+    public void SetCursorAbsolute(Vector2 pos) => SetCursorAbsolute(pos.X, pos.Y);
+
+    public void SetCursorAbsolute(int x, int y)
+    {
+        SetXCursorAbsolute(x);
+        SetYCursorAbsolute(y);
+        // ignoreDirty is set to true through
+        // SetXCursorAbsolute and SetYCursorAbsolute
+    }
+
+    public void SetXCursorAbsolute(int x)
+    {
+        if (x < _offset.X)
+        {
+            _offset.X = x;
+        } else if (x >= _offset.X + ScrollPanelWidth)
+        {
+            _offset.X = x - ScrollPanelWidth + 1;
+        }
+
+        _cursor.X = x - _offset.X;
+        _ignoreDirty = true;
+    }
+
+    public void SetYCursorAbsolute(int y)
+    {
+        if (y < _offset.Y)
+        {
+            _offset.Y = y;
+        } else if (y >= _offset.Y + ScrollPanelHeight)
+        {
+            _offset.Y = y - ScrollPanelHeight + 1;
+        }
+
+        _cursor.Y = y - _offset.Y;
+        _ignoreDirty = true;
+    }
+
     private void Render()
     {
         _renderChain.PrepareRender();
@@ -66,34 +110,41 @@ public sealed class ZinEditor
         RenderRows();
         RenderBottomLine();
 
-        _renderChain.MoveCursor(Cursor);
+        _renderChain.MoveCursor(_cursor);
         _renderChain.ShowCursor();
         _terminal.Write(_renderChain.Render());
     }
+
 
     private void RenderRows()
     {
         for (int y = 0; y < _terminal.Height - 1; y++)
         {
-            _renderChain.ClearLineRight();
-            
-            if (Content.TryGetLine(y + Content.ScrollOffset.Y, out string line))
+            if (Content.TryGetLine(y + _offset.Y, out GapBuffer line))
             {
-                _renderChain.Write(line, Content.ScrollOffset.X, _terminal.Width);
+                if (_ignoreDirty || line.Dirty)
+                {
+                    _renderChain.ClearLineRight();
+                    _renderChain.Write(line.ToString() , _offset.X, _terminal.Width);
+                    line.Dirty = false;
+                }
             }
-            else if (Content.ScrollOffset.X == 0)
+            else if (_offset.X == 0)
             {
+                _renderChain.ClearLineRight();
                 _renderChain.Write('~');
             }
             _renderChain.LineBreak();
         }
+
+        _ignoreDirty = false;
     }
 
     private void RenderBottomLine()
     {
         string modeText = Mode.GetModeText();
-        string xText = Convert.ToString(Cursor.X);
-        string yText = Convert.ToString(Cursor.Y + Content.ScrollOffset.Y + 1);
+        string xText = Convert.ToString(_cursor.X + _offset.X + 1);
+        string yText = Convert.ToString(_cursor.Y + _offset.Y + 1);
         _renderChain.MoveCursor(Width - xText.Length - yText.Length - modeText.Length - 2, Height - 1);
         _renderChain.ClearLine();
         _renderChain.Write(modeText);

@@ -2,9 +2,11 @@
 
 namespace Zin.Editor;
 
+[Flags]
 public enum EditorMode
 {
-    Visuell
+    Command,
+    Insert
 }
 
 public static class EditorModeFuncs
@@ -13,8 +15,10 @@ public static class EditorModeFuncs
     {
         switch (mode)
         {
-            case EditorMode.Visuell:
-                return "Visuell";
+            case EditorMode.Command:
+                return "Command";
+            case EditorMode.Insert:
+                return "Insert";
         }
 
         throw new ArgumentException("Invalid editor mode");

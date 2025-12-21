@@ -88,7 +88,7 @@ public class InputChar : IEquatable<InputChar>
             return true;
         }
 
-        if (obj.GetType() != GetType())
+        if (obj.GetType() != typeof(InputChar))
         {
             return false;
         }

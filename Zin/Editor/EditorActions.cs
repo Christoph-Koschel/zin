@@ -1,5 +1,3 @@
-using System;
-
 namespace Zin.Editor;
 
 public static class EditorActions
@@ -11,57 +9,62 @@ public static class EditorActions
 
     public static void MoveCursorUp(ZinEditor editor)
     {
-        if (editor.Cursor.Y > 0)
+        ImmutableVector2 cursor = editor.AbsoluteCursor;
+        if (cursor.Y > 0)
         {
-            editor.Cursor.Y--;
+            editor.SetYCursorAbsolute(cursor.Y - 1);
+        }
+
+        if (!editor.Content.TryGetLine(cursor.Y - 1, out GapBuffer gapBuffer))
+        {
             return;
         }
 
-        if (editor.Cursor.Y == 0 && editor.Content.ScrollOffset.Y > 0)
+        if (cursor.X > gapBuffer.Length)
         {
-            editor.Content.ScrollOffset.Y--;
+            editor.SetXCursorAbsolute(gapBuffer.Length);
         }
     }
 
     public static void MoveCursorDown(ZinEditor editor)
     {
-        if (editor.Cursor.Y + 1 < editor.ScrollPanelHeight)
+        ImmutableVector2 cursor = editor.AbsoluteCursor;
+        if (cursor.Y < editor.Content.RowCount - 1)
         {
-            editor.Cursor.Y++;
+            editor.SetYCursorAbsolute(cursor.Y + 1);
+        }
+
+        if (!editor.Content.TryGetLine(cursor.Y + 1, out GapBuffer gapBuffer))
+        {
             return;
         }
 
-        if (editor.Cursor.Y + 1 >= editor.ScrollPanelHeight && editor.Content.Count >= editor.Content.ScrollOffset.Y + 2)
+        if (cursor.X > gapBuffer.Length)
         {
-            editor.Content.ScrollOffset.Y++;
+            editor.SetXCursorAbsolute(gapBuffer.Length);
         }
     }
 
     public static void MoveCursorLeft(ZinEditor editor)
     {
-        if (editor.Cursor.X > 0)
+        ImmutableVector2 cursor = editor.AbsoluteCursor;
+        if (cursor.X > 0)
         {
-            editor.Cursor.X--;
-            return;
-        }
-
-        if (editor.Cursor.X == 0 && editor.Content.ScrollOffset.X > 0)
-        {
-            editor.Content.ScrollOffset.X--;
+            editor.SetXCursorAbsolute(cursor.X - 1);
         }
     }
 
     public static void MoveCursorRight(ZinEditor editor)
     {
-        if (editor.Cursor.X < editor.Width)
+        ImmutableVector2 cursor = editor.AbsoluteCursor;
+        if (!editor.Content.TryGetLine(cursor.Y, out GapBuffer gapBuffer))
         {
-            editor.Cursor.X++;
             return;
         }
 
-        if (editor.Cursor.X == editor.Width && editor.Content.ScrollOffset.X < editor.Content.MaxWidth - 1)
+        if (cursor.X < gapBuffer.Length)
         {
-            editor.Content.ScrollOffset.X++;
+            editor.SetXCursorAbsolute(cursor.X + 1);
         }
     }
 
@@ -85,19 +88,17 @@ public static class EditorActions
 
     public static void MoveToStartOfLine(ZinEditor editor)
     {
-        editor.Cursor.X = 0;
-        editor.Content.ScrollOffset.X = 0;
+        editor.SetXCursorAbsolute(0);
     }
 
     public static void MoveToEndOfLine(ZinEditor editor)
     {
-        if (!editor.Content.TryGetLine(editor.Cursor.Y, out string line))
+        if (!editor.Content.TryGetLine(editor.AbsoluteCursor.Y, out GapBuffer gapBuffer))
         {
             MoveToStartOfLine(editor);
             return;
         }
 
-        editor.Cursor.X = Math.Min(line.Length, editor.ScrollPanelWidth + 1);
-        editor.Content.ScrollOffset.X = Math.Max(0, line.Length - editor.ScrollPanelWidth);
+        editor.SetXCursorAbsolute(gapBuffer.Length);
     }
 }

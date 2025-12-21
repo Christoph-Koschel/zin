@@ -38,6 +38,11 @@ public sealed class RenderChain
     }
     public void Write(string str, int offset, int length)
     {
+        if (offset > str.Length)
+        {
+            return;
+        }
+
         int computedLength = Math.Min(Math.Max(str.Length - offset, 0), length);
         Span<char> buff = stackalloc char[computedLength];
         str.AsSpan(offset, computedLength).CopyTo(buff);
