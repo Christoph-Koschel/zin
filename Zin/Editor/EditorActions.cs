@@ -101,4 +101,7 @@ public static class EditorActions
 
         editor.SetXCursorAbsolute(gapBuffer.Length);
     }
+
+    public static void ChangeToInsertMode(ZinEditor editor) => editor.Mode = EditorMode.Insert;
+    public static void ChangeToCommandMode(ZinEditor editor) => editor.Mode = EditorMode.Command;
 }

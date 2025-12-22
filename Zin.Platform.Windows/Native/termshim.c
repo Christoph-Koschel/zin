@@ -75,6 +75,65 @@ DLL_EXPORT int term_exit_raw_mode(void)
     return 1;
 }
 
+static int handle_key_event(KEY_EVENT_RECORD key, unsigned short * c_out)
+{
+    if (!key.bKeyDown)
+    {
+        return 0;
+    }
+
+    if (key.uChar.AsciiChar)
+    {
+        unsigned char ascii_key = key.uChar.AsciiChar;
+
+        switch (ascii_key)
+        {
+        case '\x1b':
+            *c_out = EC_ESCAPE;
+            return 1;
+        default:
+            *c_out = ascii_key;
+            return 1;
+        }
+    }
+
+    switch (key.wVirtualKeyCode)
+    {
+    case VK_ESCAPE:
+        *c_out = EC_ESCAPE;
+        return 1;
+    case VK_UP:
+        *c_out = EC_ARROW_UP;
+        return 1;
+    case VK_DOWN:
+        *c_out = EC_ARROW_DOWN;
+        return 1;
+    case VK_LEFT:
+        *c_out = EC_ARROW_LEFT;
+        return 1;
+    case VK_RIGHT:
+        *c_out = EC_ARROW_RIGHT;
+        return 1;
+    case VK_PRIOR:
+        *c_out = EC_PAGE_UP;
+        return 1;
+    case VK_NEXT:
+        *c_out = EC_PAGE_DOWN;
+        return 1;
+    case VK_DELETE:
+        *c_out = EC_DELETE;
+        return 1;
+    case VK_END:
+        *c_out = EC_END;
+        return 1;
+    case VK_HOME:
+        *c_out = EC_HOME;
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 DLL_EXPORT int term_read(unsigned short * c_out)
 {
     if (h_in == NULL)
@@ -102,54 +161,7 @@ DLL_EXPORT int term_read(unsigned short * c_out)
     switch (rec.EventType)
     {
     case KEY_EVENT:
-        KEY_EVENT_RECORD key = rec.Event.KeyEvent;
-        if (!key.bKeyDown)
-        {
-            return 0;
-        }
-
-        if (key.uChar.AsciiChar)
-        {
-            *c_out = key.uChar.AsciiChar;
-            return 1;
-        }
-
-        switch (key.wVirtualKeyCode)
-        {
-        case VK_ESCAPE:
-            *c_out = EC_ESCAPE;
-            return 1;
-        case VK_UP:
-            *c_out = EC_ARROW_UP;
-            return 1;
-        case VK_DOWN:
-            *c_out = EC_ARROW_DOWN;
-            return 1;
-        case VK_LEFT:
-            *c_out = EC_ARROW_LEFT;
-            return 1;
-        case VK_RIGHT:
-            *c_out = EC_ARROW_RIGHT;
-            return 1;
-        case VK_PRIOR:
-            *c_out = EC_PAGE_UP;
-            return 1;
-        case VK_NEXT:
-            *c_out = EC_PAGE_DOWN;
-            return 1;
-        case VK_DELETE:
-            *c_out = EC_DELETE;
-            return 1;
-        case VK_END:
-            *c_out = EC_END;
-            return 1;
-        case VK_HOME:
-            *c_out = EC_HOME;
-            return 1;
-        default:
-            return 0;
-        }
-    
+        return handle_key_event(rec.Event.KeyEvent, c_out);
     default:
         return 0;
     }
