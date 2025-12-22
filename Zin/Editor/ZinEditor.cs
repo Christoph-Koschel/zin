@@ -1,4 +1,8 @@
 ﻿using System;
+using Zin.Editor.Buffer;
+using Zin.Editor.Common;
+using Zin.Editor.Input;
+using Zin.Editor.Rendering;
 using Zin.Platform.Base;
 
 namespace Zin.Editor;

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Zin.Editor.Common;
 
-namespace Zin.Editor;
+namespace Zin.Editor.Buffer;
 
 public class EditorContent
 {

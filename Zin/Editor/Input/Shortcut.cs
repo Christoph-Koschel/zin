@@ -1,7 +1,7 @@
 ﻿using System;
 using Zin.Platform.Base;
 
-namespace Zin.Editor;
+namespace Zin.Editor.Input;
 
 public sealed class Shortcut : IEquatable<Shortcut>
 {

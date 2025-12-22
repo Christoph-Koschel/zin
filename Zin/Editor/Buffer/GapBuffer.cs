@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zin.Editor;
+namespace Zin.Editor.Buffer;
 
 public sealed class GapBuffer
 {

@@ -1,4 +1,4 @@
-﻿namespace Zin.Editor;
+﻿namespace Zin.Editor.Common;
 
 public struct Vector2
 {

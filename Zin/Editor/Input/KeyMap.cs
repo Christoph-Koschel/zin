@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using Zin.Platform.Base;
 
-namespace Zin.Editor;
+namespace Zin.Editor.Input;
 
 public sealed class KeyMap
 {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Zin.Editor;
+﻿namespace Zin.Editor.Common;
 
 public struct ImmutableVector2
 {

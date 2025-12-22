@@ -1,4 +1,7 @@
-namespace Zin.Editor;
+using Zin.Editor.Buffer;
+using Zin.Editor.Common;
+
+namespace Zin.Editor.Input;
 
 public static class EditorActions
 {

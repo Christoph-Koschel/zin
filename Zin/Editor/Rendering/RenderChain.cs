@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
+using Zin.Editor.Common;
 
-namespace Zin.Editor;
+namespace Zin.Editor.Rendering;
 
 public sealed class RenderChain
 {
