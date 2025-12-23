@@ -1,5 +1,5 @@
 ﻿using System;
-using Zin.Platform.Base;
+using Zin.Editor.Input;
 
 namespace Zin.Platform.Linux.Managed;
 
