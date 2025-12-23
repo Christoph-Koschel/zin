@@ -1,5 +1,6 @@
 using Zin.Editor.Buffer;
 using Zin.Editor.Common;
+using Zin.Editor.Mode;
 
 namespace Zin.Editor.Input;
 
@@ -105,6 +106,6 @@ public static class EditorActions
         editor.SetXCursorAbsolute(gapBuffer.Length);
     }
 
-    public static void ChangeToInsertMode(ZinEditor editor) => editor.Mode = EditorMode.Insert;
-    public static void ChangeToCommandMode(ZinEditor editor) => editor.Mode = EditorMode.Command;
+    public static void ChangeToInsertMode(ZinEditor editor) => editor.Mode = new InsertMode(editor);
+    public static void ChangeToCommandMode(ZinEditor editor) => editor.Mode = new CommandMode(editor);
 }

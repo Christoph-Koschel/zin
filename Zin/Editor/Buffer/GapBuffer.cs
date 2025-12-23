@@ -20,6 +20,14 @@ public sealed class GapBuffer
         Dirty = true;
     }
 
+    public GapBuffer(char[] buffer)
+    {
+        _buffer = buffer;
+        _gapStart = buffer.Length;
+        _gapEnd = buffer.Length;
+        Dirty = true;
+    }
+
     public void InsertAt(int index, char c)
     {
         MoveGap(index);
@@ -62,6 +70,19 @@ public sealed class GapBuffer
         return index < _gapStart
             ? _buffer[index]
             : _buffer[index + (_gapEnd - _gapStart)];
+    }
+
+    public GapBuffer SplitAt(int index)
+    {
+        MoveGap(index);
+
+        char[] buffer = new char[(_buffer.Length - _gapEnd) * 2];
+        Array.Copy(_buffer, _gapEnd, buffer, 0, _buffer.Length - _gapEnd);
+
+        _gapEnd = _buffer.Length;
+        Dirty = true;
+
+        return new GapBuffer(buffer);
     }
 
     private void MoveGap(int index)

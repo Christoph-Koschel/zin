@@ -1,26 +1,17 @@
-﻿using System;
+﻿using Zin.Editor.Input;
 
 namespace Zin.Editor;
 
-[Flags]
-public enum EditorMode
+public abstract class EditorMode
 {
-    Command,
-    Insert
-}
+    public abstract string DisplayName { get; }
 
-public static class EditorModeFuncs
-{
-    public static string GetModeText(this EditorMode mode)
+    protected readonly ZinEditor Editor;
+
+    public EditorMode(ZinEditor editor)
     {
-        switch (mode)
-        {
-            case EditorMode.Command:
-                return "Command";
-            case EditorMode.Insert:
-                return "Insert";
-        }
-
-        throw new ArgumentException("Invalid editor mode");
+        Editor = editor;
     }
+
+    public abstract void HandleInput(InputChar input);
 }

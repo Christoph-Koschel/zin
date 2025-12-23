@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Zin.Editor.Mode;
 
 namespace Zin.Editor.Input;
 
@@ -45,7 +46,7 @@ public sealed class KeyMap
 
         foreach ((Shortcut shortcut, Action<ZinEditor> action) in _actions)
         {
-            if (!shortcut.Mode.HasFlag(editor.Mode))
+            if (shortcut.EditorModeType is not null && shortcut.EditorModeType != editor.Mode.GetType())
             {
                 continue;
             }
@@ -118,23 +119,23 @@ public sealed class KeyMap
         // TODO this section should be ported to a javascript configuration file
         KeyMap map = new KeyMap();
         // General commands
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.ArrowUp, true)), EditorActions.MoveCursorUp);
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.ArrowDown, true)), EditorActions.MoveCursorDown);
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.ArrowLeft, true)), EditorActions.MoveCursorLeft);
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.ArrowRight, true)), EditorActions.MoveCursorRight);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.ArrowUp, true)), EditorActions.MoveCursorUp);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.ArrowDown, true)), EditorActions.MoveCursorDown);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.ArrowLeft, true)), EditorActions.MoveCursorLeft);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.ArrowRight, true)), EditorActions.MoveCursorRight);
 
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.PageUp, true)), EditorActions.MovePageUp);
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.PageDown, true)), EditorActions.MovePageDown);
+        map.RegisterAction(new Shortcut( new InputChar(InputChar.EscapeCode.PageUp, true)), EditorActions.MovePageUp);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.PageDown, true)), EditorActions.MovePageDown);
 
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.Home, true)), EditorActions.MoveToStartOfLine);
-        map.RegisterAction(new Shortcut(EditorMode.Command | EditorMode.Insert, new InputChar(InputChar.EscapeCode.End, true)), EditorActions.MoveToEndOfLine);
+        map.RegisterAction(new Shortcut(new InputChar(InputChar.EscapeCode.Home, true)), EditorActions.MoveToStartOfLine);
+        map.RegisterAction(new Shortcut( new InputChar(InputChar.EscapeCode.End, true)), EditorActions.MoveToEndOfLine);
 
-        map.RegisterAction(new Shortcut(EditorMode.Insert, new InputChar(InputChar.EscapeCode.Escape, true)), EditorActions.ChangeToCommandMode);
+        map.RegisterAction(new Shortcut(typeof(InsertMode), new InputChar(InputChar.EscapeCode.Escape, true)), EditorActions.ChangeToCommandMode);
 
         // Command specific commands
-        map.RegisterAction(new Shortcut(EditorMode.Command, new InputChar('q', true)), EditorActions.Exit);
+        map.RegisterAction(new Shortcut(typeof(CommandMode), new InputChar('q', true)), EditorActions.Exit);
 
-        map.RegisterAction(new Shortcut(EditorMode.Command, new InputChar('i', false)), EditorActions.ChangeToInsertMode);
+        map.RegisterAction(new Shortcut(typeof(CommandMode), new InputChar('i', false)), EditorActions.ChangeToInsertMode);
 
         return map;
     }

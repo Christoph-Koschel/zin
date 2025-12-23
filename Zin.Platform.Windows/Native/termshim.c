@@ -25,6 +25,7 @@ typedef enum {
     EC_END,
     EC_HOME,
 
+    EC_ENTER,
     EC_BACKSPACE
 } EscapeCode;
 
@@ -98,6 +99,11 @@ static int handle_key_event(KEY_EVENT_RECORD key, unsigned short * c_out)
             // STRG + H = Backspace ambigous.
             // We need to look up if virtual_key was set
             *c_out = virtual_key == VK_BACK ? EC_BACKSPACE : 8;
+            return 1;
+        case 13: // STR + M
+            // STRG + M = Enter ambigous.
+            // We need to look up if virtual_key was set
+            *c_out = virtual_key == VK_RETURN ? EC_ENTER : 13;
             return 1;
         default:
             *c_out = ascii_key;

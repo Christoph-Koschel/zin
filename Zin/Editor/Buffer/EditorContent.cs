@@ -66,6 +66,20 @@ public class EditorContent
         gapBuffer.ReplaceAt(x, c);
     }
 
+    public void InsertLineBreak(ImmutableVector2 pos) => InsertLineBreak(pos.X, pos.Y);
+    public void InsertLineBreak(Vector2 pos) => InsertLineBreak(pos.X, pos.Y);
+
+    public void InsertLineBreak(int x, int y)
+    {
+        if (!TryGetLine(y, out GapBuffer gapBuffer))
+        {
+            throw new ArgumentOutOfRangeException(nameof(y));
+        }
+
+        GapBuffer nextLine = gapBuffer.SplitAt(x);
+        _rows.Insert(y + 1, nextLine);
+    }
+
     public bool TryGetLine(int i, out GapBuffer gapBuffer)
     {
         gapBuffer = null;

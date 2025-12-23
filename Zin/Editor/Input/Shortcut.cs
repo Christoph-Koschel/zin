@@ -4,18 +4,17 @@ namespace Zin.Editor.Input;
 
 public sealed class Shortcut : IEquatable<Shortcut>
 {
-    public readonly EditorMode Mode;
+    public readonly Type EditorModeType;
     public readonly InputChar[] Sequence;
 
     private readonly int _hashCode;
 
-    public Shortcut(EditorMode mode, InputChar[] sequence)
+    public Shortcut(InputChar[] sequence)
     {
-        Mode = mode;
+        EditorModeType = null;
         Sequence = sequence;
 
         HashCode hash = new HashCode();
-        hash.Add(Mode);
         foreach (InputChar key in sequence)
         {
             hash.Add(key);
@@ -24,13 +23,36 @@ public sealed class Shortcut : IEquatable<Shortcut>
         _hashCode = hash.ToHashCode();
     }
 
-    public Shortcut(EditorMode mode, InputChar key)
+    public Shortcut(InputChar key)
     {
-        Mode = mode;
+        EditorModeType = null;
+        Sequence = [key];
+
+        _hashCode = key.GetHashCode();
+    }
+
+    public Shortcut(Type editorModeType, InputChar[] sequence)
+    {
+        EditorModeType = editorModeType;
+        Sequence = sequence;
+
+        HashCode hash = new HashCode();
+        hash.Add(EditorModeType);
+        foreach (InputChar key in sequence)
+        {
+            hash.Add(key);
+        }
+
+        _hashCode = hash.ToHashCode();
+    }
+
+    public Shortcut(Type editorModeType, InputChar key)
+    {
+        EditorModeType = editorModeType;
         Sequence = [key];
 
         HashCode hash = new HashCode();
-        hash.Add(Mode);
+        hash.Add(EditorModeType);
         hash.Add(key);
 
         _hashCode = hash.ToHashCode();
@@ -63,7 +85,7 @@ public sealed class Shortcut : IEquatable<Shortcut>
             return false;
         }
 
-        return Mode == other.Mode && Sequence.SequenceEqual(other.Sequence);
+        return EditorModeType == other.EditorModeType && Sequence.SequenceEqual(other.Sequence);
     }
 
     public override bool Equals(object obj)

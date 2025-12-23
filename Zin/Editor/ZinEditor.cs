@@ -2,6 +2,7 @@
 using Zin.Editor.Buffer;
 using Zin.Editor.Common;
 using Zin.Editor.Input;
+using Zin.Editor.Mode;
 using Zin.Editor.Rendering;
 using Zin.Platform;
 
@@ -38,7 +39,7 @@ public sealed class ZinEditor
         _offset = new Vector2();
 
         Content = new EditorContent(terminal.Height);
-        Mode = EditorMode.Command;
+        Mode = new CommandMode(this);
     }
 
     public void Run()
@@ -60,12 +61,7 @@ public sealed class ZinEditor
                 continue;
             }
 
-            switch (Mode)
-            {
-                case EditorMode.Insert:
-                    HandleInsertMode(c);
-                    break;
-            }
+            Mode.HandleInput(c);
 
             Render();
         }
@@ -113,31 +109,6 @@ public sealed class ZinEditor
         _cursor.Y = y - _offset.Y;
     }
 
-    private void HandleInsertMode(InputChar c)
-    {
-        ImmutableVector2 cursor = AbsoluteCursor;
-        // TODO think about special control chars
-        if (c.Ctrl)
-        {
-            return;
-        }
-
-        if (c.Escape && c.Raw == (byte)InputChar.EscapeCode.BACKSPACE)
-        {
-            if (cursor.X == 0)
-            {
-                return;
-            }
-
-            Content.Delete(cursor);
-            SetXCursorAbsolute(cursor.X - 1);
-            return;
-        }
-
-        Content.Insert(cursor, (char)c.Raw);
-        SetXCursorAbsolute(cursor.X + 1);
-    }
-
     private void Render()
     {
         _renderChain.PrepareRender();
@@ -179,7 +150,7 @@ public sealed class ZinEditor
 
     private void RenderBottomLine()
     {
-        string modeText = Mode.GetModeText();
+        string modeText = Mode.DisplayName;
         string xText = Convert.ToString(_cursor.X + _offset.X + 1);
         string yText = Convert.ToString(_cursor.Y + _offset.Y + 1);
         _renderChain.MoveCursor(Width - xText.Length - yText.Length - modeText.Length - 2, Height - 1);

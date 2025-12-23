@@ -103,6 +103,7 @@ public class InputChar : IEquatable<InputChar>
         End,
         Home,
 
-        BACKSPACE
+        Enter,
+        Backspace
     }
 }
