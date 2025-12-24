@@ -9,6 +9,8 @@ public class InputChar : IEquatable<InputChar>
     public bool Ctrl => !Escape && Raw is >= 1 and <= 26;
     public bool Invalid => !Escape && Raw == 0;
 
+    public EscapeCode EscCode => (EscapeCode)Raw;
+
     public InputChar(char c, bool ctrl)
     {
         byte b = (byte)c;

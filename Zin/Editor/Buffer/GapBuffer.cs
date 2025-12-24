@@ -85,6 +85,16 @@ public sealed class GapBuffer
         return new GapBuffer(buffer);
     }
 
+    public void Merge(GapBuffer other)
+    {
+        MoveGap(Length - 1);
+        EnsureGap(other.Length);
+        Array.Copy(other._buffer, 0, _buffer, _gapStart, other._gapStart);
+        _gapStart += other._gapStart;
+        Array.Copy(other._buffer, other._gapEnd, _buffer, _gapStart, other._buffer.Length - other._gapEnd);
+        Dirty = true;
+    }
+
     private void MoveGap(int index)
     {
         index = Math.Clamp(index, 0, Length);

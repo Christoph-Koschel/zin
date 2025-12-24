@@ -80,15 +80,52 @@ public class EditorContent
         _rows.Insert(y + 1, nextLine);
     }
 
-    public bool TryGetLine(int i, out GapBuffer gapBuffer)
+    public void RemoveStartLineBreak(ImmutableVector2 pos) => RemoveStartLineBreak(pos.Y);
+    public void RemoveStartLineBreak(Vector2 pos) => RemoveStartLineBreak(pos.Y);
+
+    public void RemoveStartLineBreak(int y)
+    {
+        if (y == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(y));
+        }
+
+        if (!TryGetLine(y, out GapBuffer line))
+        {
+            throw new ArgumentOutOfRangeException(nameof(y));
+        }
+
+        if (!TryGetLine(y - 1, out GapBuffer previousLine))
+        {
+            throw new ArgumentOutOfRangeException(nameof(y));
+        }
+
+        previousLine.Merge(line);
+        _rows.RemoveAt(y);
+    }
+
+    public void RemoveEndLineBreak(ImmutableVector2 pos) => RemoveEndLineBreak(pos.Y);
+    public void RemoveEndLineBreak(Vector2 pos) => RemoveEndLineBreak(pos.Y);
+
+    public void RemoveEndLineBreak(int y)
+    {
+        if (y + 1 >= _rows.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(y));
+        }
+
+        RemoveStartLineBreak(y + 1);
+    }
+
+    public bool TryGetLine(int y, out GapBuffer gapBuffer)
     {
         gapBuffer = null;
-        if (i < 0 || i >= _rows.Count)
+        if (y < 0 || y >= _rows.Count)
         {
             return false;
         }
 
-        gapBuffer = _rows[i];
+        gapBuffer = _rows[y];
         return true;
 
     }

@@ -14,12 +14,12 @@ public sealed class ZinEditor
     private readonly KeyMap _keyMap;
     private bool _stopped;
     private RenderChain _renderChain;
-    private bool _ignoreDirty;
     private Vector2 _cursor;
     private Vector2 _offset;
 
     public EditorContent Content;
     public EditorMode Mode;
+    public bool IgnoreDirty;
 
     public ImmutableVector2 AbsoluteCursor => new ImmutableVector2(_cursor.X + _offset.X, _cursor.Y + _offset.Y);
     public int Width => _terminal.Width;
@@ -34,12 +34,12 @@ public sealed class ZinEditor
         _keyMap = keyMap;
         _stopped = false;
         _renderChain = new RenderChain(terminal.Width, terminal.Height);
-        _ignoreDirty = true;
         _cursor = new Vector2();
         _offset = new Vector2();
 
         Content = new EditorContent(terminal.Height);
         Mode = new CommandMode(this);
+        IgnoreDirty = true;
     }
 
     public void Run()
@@ -84,11 +84,11 @@ public sealed class ZinEditor
         if (x < _offset.X)
         {
             _offset.X = x;
-            _ignoreDirty = true;
+            IgnoreDirty = true;
         } else if (x >= _offset.X + ScrollPanelWidth)
         {
             _offset.X = x - ScrollPanelWidth + 1;
-            _ignoreDirty = true;
+            IgnoreDirty = true;
         }
 
         _cursor.X = x - _offset.X;
@@ -99,11 +99,11 @@ public sealed class ZinEditor
         if (y < _offset.Y)
         {
             _offset.Y = y;
-            _ignoreDirty = true;
+            IgnoreDirty = true;
         } else if (y >= _offset.Y + ScrollPanelHeight)
         {
             _offset.Y = y - ScrollPanelHeight + 1;
-            _ignoreDirty = true;
+            IgnoreDirty = true;
         }
 
         _cursor.Y = y - _offset.Y;
@@ -130,7 +130,7 @@ public sealed class ZinEditor
         {
             if (Content.TryGetLine(y + _offset.Y, out GapBuffer line))
             {
-                if (_ignoreDirty || line.Dirty)
+                if (IgnoreDirty || line.Dirty)
                 {
                     _renderChain.ClearLineRight();
                     _renderChain.Write(line.ToString() , _offset.X, _terminal.Width);
@@ -145,7 +145,7 @@ public sealed class ZinEditor
             _renderChain.LineBreak();
         }
 
-        _ignoreDirty = false;
+        IgnoreDirty = false;
     }
 
     private void RenderBottomLine()
