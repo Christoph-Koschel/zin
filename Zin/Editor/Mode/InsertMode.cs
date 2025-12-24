@@ -76,6 +76,7 @@ public sealed class InsertMode : EditorMode
         {
             Editor.Content.InsertLineBreak(cursor);
             Editor.SetCursorAbsolute(0, cursor.Y + 1);
+            Editor.IgnoreDirty = true;
             return;
         }
     }

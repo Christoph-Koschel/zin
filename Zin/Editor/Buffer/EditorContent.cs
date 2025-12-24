@@ -10,22 +10,26 @@ public class EditorContent
     private List<GapBuffer> _rows;
 
     public int RowCount => _rows.Count;
+    public bool OnceModified { get; private set; }
 
     public EditorContent(int capacity)
     {
         _rows = new List<GapBuffer>(capacity);
+        OnceModified = false;
     }
 
     public void OpenContent(string content)
     {
         _rows.Clear();
         _rows.AddRange(content.Split(Environment.NewLine).Select(line => new GapBuffer(line)));
+        OnceModified = false;
     }
 
     public void OpenContent(IEnumerable<string> lines)
     {
         _rows.Clear();
         _rows.AddRange(lines.Select(line => new GapBuffer(line)));
+        OnceModified = false;
     }
 
     public void Insert(ImmutableVector2 pos, char c) => Insert(pos.X, pos.Y, c);
@@ -39,6 +43,7 @@ public class EditorContent
         }
 
         gapBuffer.InsertAt(x, c);
+        OnceModified = true;
     }
 
     public void Delete(ImmutableVector2 pos) => Delete(pos.X, pos.Y);
@@ -52,6 +57,7 @@ public class EditorContent
         }
 
         gapBuffer.DeleteAt(x - 1);
+        OnceModified = true;
     }
 
     public void Replace(Vector2 pos, char c) => Replace(pos.X, pos.Y, c);
@@ -64,6 +70,7 @@ public class EditorContent
         }
 
         gapBuffer.ReplaceAt(x, c);
+        OnceModified = true;
     }
 
     public void InsertLineBreak(ImmutableVector2 pos) => InsertLineBreak(pos.X, pos.Y);
@@ -78,6 +85,7 @@ public class EditorContent
 
         GapBuffer nextLine = gapBuffer.SplitAt(x);
         _rows.Insert(y + 1, nextLine);
+        OnceModified = true;
     }
 
     public void RemoveStartLineBreak(ImmutableVector2 pos) => RemoveStartLineBreak(pos.Y);
@@ -102,6 +110,7 @@ public class EditorContent
 
         previousLine.Merge(line);
         _rows.RemoveAt(y);
+        OnceModified = true;
     }
 
     public void RemoveEndLineBreak(ImmutableVector2 pos) => RemoveEndLineBreak(pos.Y);
@@ -115,6 +124,7 @@ public class EditorContent
         }
 
         RemoveStartLineBreak(y + 1);
+        OnceModified = true;
     }
 
     public bool TryGetLine(int y, out GapBuffer gapBuffer)

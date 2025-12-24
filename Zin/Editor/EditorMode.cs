@@ -14,4 +14,10 @@ public abstract class EditorMode
     }
 
     public abstract void HandleInput(InputChar input);
+
+    public virtual bool GetStatusText(out string text)
+    {
+        text = null;
+        return false;
+    }
 }
