@@ -10,10 +10,25 @@
         <NativeOutputDir>$(BaseIntermediateOutputPath)native</NativeOutputDir>
     </PropertyGroup>
 
-    <Target Name="BuildNative" BeforeTargets="CoreCompile">
+    <!-- Release configuration -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <PublishSingleFile>false</PublishSingleFile>
+        <SelfContained>true</SelfContained>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <Target Name="BuildNative" BeforeTargets="CoreCompile" Condition="'$(Configuration)' == 'Debug'">
         <MakeDir Directories="$(NativeOutputDir)"/>
 
-        <Exec Command="zig cc -shared ./Native/termshim.c -o $(NativeOutputDir)/termshim.dll -target x86_64-windows-gnu"/>
+        <Exec Command="zig cc -shared -g -DDEBUG -fPIC ./Native/termshim.c -o $(NativeOutputDir)/termshim.dll -target x86_64-windows-gnu"/>
+    </Target>
+
+    <Target Name="BuildNative" BeforeTargets="CoreCompile" Condition="'$(Configuration)' == 'Release'">
+        <MakeDir Directories="$(NativeOutputDir)"/>
+
+        <Exec Command="zig cc -shared -O3 -DNDEBUG -fPIC ./Native/termshim.c -o $(NativeOutputDir)/termshim.dll -target x86_64-windows-gnu "/>
     </Target>
 
     <ItemGroup>
